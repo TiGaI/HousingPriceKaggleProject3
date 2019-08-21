@@ -37,14 +37,66 @@ def rmsle_cv(model):
     rmse= np.sqrt(-cross_val_score(model, train.values, y_train, scoring="neg_mean_squared_error", cv = kf))
     return(rmse)
 
+
+# Here is the list of such models:
+
+# linear_model.ElasticNetCV([l1_ratio, eps, …])	Elastic Net model with iterative fitting along a regularization path.
+# linear_model.LarsCV([fit_intercept, …])	Cross-validated Least Angle Regression model.
+# linear_model.LassoCV([eps, n_alphas, …])	Lasso linear model with iterative fitting along a regularization path.
+# linear_model.LassoLarsCV([fit_intercept, …])	Cross-validated Lasso, using the LARS algorithm.
+# linear_model.LogisticRegressionCV([Cs, …])	Logistic Regression CV (aka logit, MaxEnt) classifier.
+# linear_model.MultiTaskElasticNetCV([…])	Multi-task L1/L2 ElasticNet with built-in cross-validation.
+# linear_model.MultiTaskLassoCV([eps, …])	Multi-task Lasso model trained with L1/L2 mixed-norm as regularizer.
+# linear_model.OrthogonalMatchingPursuitCV([…])	Cross-validated Orthogonal Matching Pursuit model (OMP).
+# linear_model.RidgeCV([alphas, …])	Ridge regression with built-in cross-validation.
+# linear_model.RidgeClassifierCV([alphas, …])	Ridge classifier with built-in cross-validation.
+
 ### MODEL IMPORTS
-# LINEAR MODEL
-from sklearn.linear_model import ElasticNet, Lasso,  BayesianRidge, LassoLarsIC
-# 
+# LINEAR MODELcd
+from sklearn.linear_model import LinearRegression, Lasso, Ridge, ElasticNet, BayesianRidge, LassoLarsIC, KernelRidge
+
+#Grid Search
+lasso_params = {'alpha':[0.02, 0.024, 0.025, 0.026, 0.03]}
+ridge_params = {'alpha':[200, 230, 250,265, 270, 275, 290, 300, 500]}
+eNet_params = {"max_iter": [1, 5, 10, 100, 500, 100],
+                      "alpha": [0.0001, 0.001, 0.01, 0.1, 1, 10, 100],
+                      "l1_ratio": np.arange(0.0, 1.0, 0.1)}
+bayesianRidge_params = {"n_iter": [100, 200, 300],
+						"alpha_1": [0.00001, 0.0001, 0.001, 0.01, 0.1, 1, 10],
+						"alpha_2": [0.00001, 0.0001, 0.001, 0.01, 0.1, 1, 10],
+						"lambda_1": [0.00001, 0.0001, 0.001, 0.01, 0.1, 1, 10],
+						"lambda_2": [0.00001, 0.0001, 0.001, 0.01, 0.1, 1, 10],
+}
+
+#Base Regression Model:
+baseRegression = LinearRegression().fit(X, y)
+
+#Grid Search
+from sklearn.model_selection import GridSearchCV
+lasso_Best = GridSearchCV(Lasso(), param_grid=lasso_params).fit(X, y)
+lasso_Best.best_estimator_
+
+ridge_Best = GridSearchCV(ridge(), param_grid=ridge_params).fit(X, y)
+ridge_Best.best_estimator_
+
+eNet_Best = GridSearchCV(ElasticNet(), parametersGrid, scoring='r2', cv=5).fit(X, y)
+eNet_Best.best_estimator_
+
+BayesianRidge_Best = GridSearchCV(BayesianRidge(), bayesianRidge_params, scoring='r2', cv=5).fit(X, y)
+eNet_Best.best_estimator_
+
+KRR = KernelRidge(alpha=0.6, kernel='polynomial', degree=2, coef0=2.5)
+
+
+
 from sklearn.isotonic import IsotonicRegression
 
 ir = IsotonicRegression()
 y_ir = ir.fit_transform()
+
+
+
+
 
 # Tree Base Model
 from sklearn.tree import DecisionTreeRegressor
