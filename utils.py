@@ -309,3 +309,9 @@ def schPlace(x):
 		return 'Mitchel'
 	elif x['School_Name'] == 'Northwood Pre-School':
 		return 'NWAmes'
+
+
+def dummify(df):
+	catTrain = df.loc[:, df.dtypes == 'object']
+	df_full = pd.get_dummies(df, columns=list(catTrain.columns), drop_first=True)
+	return df_full 
