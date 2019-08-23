@@ -65,7 +65,7 @@ def ImputeMissingValue(df):
 
 def FeatureEngineering(df):
 	## create a new variable indicating whether the house has a pool or not
-	df['Pool'] = df['PoolArea'].apply(lambda x: 1 if x > 0 else 0)  
+	df['Pool'] = df['PoolArea'].apply(lambda x: 1 if x > 0 else 0).copy() 
 
 	## Hash 'PoolQC'
 	PoolReplacement = {
