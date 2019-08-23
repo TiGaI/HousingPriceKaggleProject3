@@ -4,6 +4,7 @@ import re
 from utils import *
 
 if __name__ == '__main__':
+	### remember to change test to train if train is needed 
 	filename = 'https://raw.githubusercontent.com/TiGaI/HousingPriceKaggleProject3/master/data/test.csv'
 	df = pd.read_csv(filename)
 	df.drop('Id', axis = 1, inplace = True)
@@ -16,6 +17,7 @@ if __name__ == '__main__':
 	df = AddInterest(interest_df, df)
 	df = SchoolRank(sch_rank, df)
 	df.drop(['Unnamed: 0'], axis = 1, inplace = True)
+	df_dummified = dummify(df)
 
 	if 'SalePrice' in list(df.columns):
 		saleprice = AddHPI(ameshpi, df)
@@ -23,4 +25,5 @@ if __name__ == '__main__':
 		saleprice.to_csv(r'./data/price.csv', index = False)
 
 	df.to_csv(r'./data/test.csv', index = False)
+	df_dummified.to_csv(r'./data/test_dummified.csv', index = False)
 		
