@@ -30,6 +30,37 @@ def ImputeMissingValue(df):
 	# fill in the NAs of 'GarageType' with 'None'
 	df['GarageType'].fillna("None", inplace=True)
 
+
+	df['MSZoning'].fillna('RL', inplace = True)
+
+	df['BsmtFullBath'].fillna(0.0, inplace = True)
+
+	df['BsmtHalfBath'].fillna(0.0, inplace = True)
+
+	df['Utilities'].fillna('AllPub', inplace = True)
+
+	df['Functional'].fillna(5.0, inplace = True)
+
+	df['Exterior1st'].fillna('VinylSd', inplace = True)
+
+	df['TotalBsmtSF'].fillna(df['TotalBsmtSF'].mean(), inplace = True)
+
+	df['BsmtUnfSF'].fillna(df['BsmtUnfSF'].mean(), inplace = True)
+
+	df['BsmtFinSF2'].fillna(df['BsmtFinSF2'].mean(), inplace = True)
+
+	df['KitchenQual'].fillna(3.0, inplace = True)
+
+	df['BsmtFinSF1'].fillna(df['BsmtFinSF1'].mean(), inplace = True)
+
+	df['GarageCars'].fillna(2.0, inplace = True)
+	                                       
+	df['GarageArea'].fillna(df['GarageArea'].mean(), inplace = True)
+	                                       
+	df['Exterior2nd'].fillna('VinylSd', inplace = True)
+	                                       
+	df['SaleType'].fillna('WD', inplace = True)
+
 	return df
 
 def FeatureEngineering(df):
@@ -175,6 +206,7 @@ def FeatureEngineering(df):
 	df_full = pd.concat([df, tempstyle], axis = 1)
 	df_full['Floor'] = df_full.apply (lambda row: FloorCol(row), axis=1)
 	df_full['Floor'] = df_full['Floor'].astype(np.float16)
+	df_full['Floor'].fillna(df_full['Floor'].mean(), inplace = True)
 
 	### fill in the blanks for Finish
 	df_full['Finish'].fillna(1, inplace=True)
@@ -311,7 +343,26 @@ def schPlace(x):
 		return 'NWAmes'
 
 
-def dummify(df):
+def Dummify(df):
+	'''
+	this function will dummify the variables that has dtypes as object
+	'''
 	catTrain = df.loc[:, df.dtypes == 'object']
 	df_full = pd.get_dummies(df, columns=list(catTrain.columns), drop_first=True)
-	return df_full 
+	return df_full
+
+
+def CheckMissing(df):
+	'''
+	this function will check whether the dataset has missing values 
+	'''
+	missing = df.isna()
+	num_missing = missing.sum().to_frame()
+	num_missing['Percentage'] = num_missing[0]/1460
+	num_missing.columns = ['Missing Value', 'Percentage']
+	num_missing = num_missing.sort_values('Percentage', ascending = False)
+	num = num_missing[num_missing['Missing Value'] > 0].shape[0]
+	if num == 0:
+		print('No missing value in the dataset')
+	else:
+		print(num_missing[num_missing['Missing Value'] > 0])
