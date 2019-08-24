@@ -1,5 +1,8 @@
 import pandas as pd
 import numpy as np
+from sklearn.preprocessing import StandardScaler
+from scipy import stats
+from scipy.special import boxcox1p
 import re
 
 def ImputeMissingValue(df):
@@ -54,11 +57,11 @@ def ImputeMissingValue(df):
 	df['BsmtFinSF1'].fillna(df['BsmtFinSF1'].mean(), inplace = True)
 
 	df['GarageCars'].fillna(2.0, inplace = True)
-	                                       
+										   
 	df['GarageArea'].fillna(df['GarageArea'].mean(), inplace = True)
-	                                       
+										   
 	df['Exterior2nd'].fillna('VinylSd', inplace = True)
-	                                       
+										   
 	df['SaleType'].fillna('WD', inplace = True)
 
 	return df
@@ -262,7 +265,6 @@ def SchoolRank(sch_rank, df):
 def WeightedBasement(x):
 	'''
 	this function will calculate the WeightedBasement area of the house and return such area
-
 	'''
 	if x['BsmtFinType1'] == 1:
 		return x['TotalBsmtSF'] 
@@ -285,7 +287,6 @@ def PUDCol(x):
 def FloorCol(df):
 	'''
 	this function will fill in the blanks for floor based on the value of 'MSSubClass'
-
 	'''
 	if df['HouseStyle'] == 'SFoyer':
 		if df['MSSubClass'] == 85:
@@ -366,3 +367,50 @@ def CheckMissing(df):
 		print('No missing value in the dataset')
 	else:
 		print(num_missing[num_missing['Missing Value'] > 0])
+
+def CheckMissing(df):
+	'''
+	this function will check whether the dataset has missing values 
+	'''
+	missing = df.isna()
+	num_missing = missing.sum().to_frame()
+	num_missing['Percentage'] = num_missing[0]/1460
+	num_missing.columns = ['Missing Value', 'Percentage']
+	num_missing = num_missing.sort_values('Percentage', ascending = False)
+	num = num_missing[num_missing['Missing Value'] > 0].shape[0]
+	if num == 0:
+		print('No missing value in the dataset')
+	else:
+		print(num_missing[num_missing['Missing Value'] > 0])
+
+
+def Standardize(df):
+	'''
+	this function will standardize all the numeric variables including the ordinal variables with mean of 0 and variance of 1
+	'''
+	df_num = df.loc[:, df.dtypes != 'object']
+	df_cat = df.loc[:, df.dtypes == 'object']
+	df_num = df_num.astype('float64')
+
+	# Standardizing the features
+	df_num_scaled = pd.DataFrame(StandardScaler().fit_transform(df_num), columns = df_num.columns)   # Use StandardScaler to help you standardize the features
+
+	return pd.concat([df_num_scaled, df_cat], axis = 1)
+
+
+def Normalize(df, lam):
+	'''
+	this function will normalize the numeric variables including the ordinal variables with mean of 0 and variance of 1
+	'''
+	idx_num = df.dtypes[df.dtypes != "object"].index
+
+	# Check how skewed they are
+	skew_num = df[idx_num].apply(lambda x: stats.skew(x.dropna())).sort_values(ascending=False)
+	skewness = skew_num[abs(skew_num) > 0.5]
+
+	df_full = df.copy()
+	for feat in skewness.index:
+		df_full[feat] = boxcox1p(df_full[feat], 0.15)
+
+	return df_full
+
