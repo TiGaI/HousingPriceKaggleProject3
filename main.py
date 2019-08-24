@@ -1,6 +1,9 @@
 import pandas as pd
 import numpy as np
 import re
+from sklearn.preprocessing import StandardScaler
+#from scipy import stats
+#from scipy.special import boxcox1p
 from utils import *
 
 if __name__ == '__main__':
@@ -34,6 +37,12 @@ if __name__ == '__main__':
 	
 	# drop the unnecessary columns
 	dataset.drop(['Unnamed: 0'], axis = 1, inplace = True)
+
+	# standardize the numeric variables
+	dataset = Standardize(dataset)
+
+	# normalize the numeric variables
+	#dataset = Normalize(dataset, 0.15)
 	
 	# dummify the variables
 	dataset_dummified = Dummify(dataset)
@@ -46,9 +55,9 @@ if __name__ == '__main__':
 	test_df = dataset.iloc[1460:2919]
 
 
-	train_dummified = dataset_dummified.iloc[0:1461]
+	train_dummified = dataset_dummified.iloc[0:1460]
 
-	test_dummified = dataset_dummified.iloc[1461:2919]
+	test_dummified = dataset_dummified.iloc[1460:2919]
 
 	saleprice.to_csv(r'./data/price.csv', index = False)
 	train_df.to_csv(r'./data/train_df.csv', index = False)
